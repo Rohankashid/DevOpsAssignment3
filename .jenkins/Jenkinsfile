@@ -16,10 +16,11 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                git branch: "${params.BRANCH_NAME}", url: 'https://github.com/your-username/your-repo.git'
-            }
-        }
+    steps {
+        git branch: "${params.BRANCH_NAME}", url: 'https://github.com/Rohankashid/DevOpsAssignment3.git'
+    }
+}
+
 
         stage('Backup Existing HTML') {
             steps {
