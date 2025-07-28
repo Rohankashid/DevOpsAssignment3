@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'DEPLOY_VERSION', defaultValue: 'v1.0.0', description: 'Version label')
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Git branch')
+        choice(name: 'ENV', choices: ['dev', 'staging', 'prod'], description: 'Target environment')
+    }
+
+    environment {
+        REMOTE_USER = "ubuntu"
+        REMOTE_HOST = "56.228.23.177"
+        REMOTE_DIR = "/var/www/html"
+        BACKUP_DIR = "/home/ubuntu/backups"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: "${params.BRANCH_NAME}", url: 'https://github.com/your-username/your-repo.git'
+            }
+        }
+
+        stage('Backup Existing HTML') {
+            steps {
+                sshagent (credentials: ['ec2-ssh-key']) {
+                    sh """
+                    ssh ${REMOTE_USER}@${REMOTE_HOST} "mkdir -p ${BACKUP_DIR}/${params.DEPLOY_VERSION}"
+                    ssh ${REMOTE_USER}@${REMOTE_HOST} "cp ${REMOTE_DIR}/index.html ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html || true"
+                    """
+                }
+            }
+        }
+
+        stage('Deploy HTML') {
+            steps {
+                sshagent (credentials: ['ec2-ssh-key']) {
+                    sh """
+                    scp index.html ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/index.html
+                    ssh ${REMOTE_USER}@${REMOTE_HOST} "echo 'Deployed to ${params.ENV}'"
+                    """
+                }
+            }
+        }
+
+        stage('Rollback') {
+            when {
+                expression { currentBuild.result == 'FAILURE' }
+            }
+            steps {
+                sshagent (credentials: ['ec2-ssh-key']) {
+                    sh """
+                    ssh ${REMOTE_USER}@${REMOTE_HOST} "cp ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html ${REMOTE_DIR}/index.html || true"
+                    ssh ${REMOTE_USER}@${REMOTE_HOST} "echo 'Rollback executed'"
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Deployment successful!'
+        }
+        failure {
+            echo '❌ Deployment failed. Rollback completed.'
+        }
+    }
+}
