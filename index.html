@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Netflix Clone Inline</title>
+  <style>
+    body {
+      margin: 0;
+      background: #141414;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(20,20,20,0.98);
+      padding: 16px 32px;
+      position: fixed;
+      width: 100%;
+      z-index: 1;
+    }
+
+    .logo {
+      font-size: 2rem;
+      color: #e50914;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    nav a {
+      color: #fff;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .profile img {
+      width: 32px;
+      border-radius: 4px;
+    }
+
+    .banner {
+      position: relative;
+      margin-top: 64px;
+      height: 360px;
+      background: #333;
+      overflow: hidden;
+    }
+
+    .banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.65;
+    }
+
+    .banner-content {
+      position: absolute;
+      top: 50%;
+      left: 5%;
+      transform: translateY(-50%);
+    }
+
+    .banner-content h1 {
+      font-size: 3rem;
+      margin: 0 0 10px;
+    }
+
+    .banner-content p {
+      max-width: 400px;
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+    }
+
+    .banner-content button {
+      background: #fff;
+      border: none;
+      padding: 10px 24px;
+      margin-right: 10px;
+      font-size: 1rem;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .banner-content .more-info {
+      background: rgba(109, 109, 110, 0.7);
+      color: #fff;
+    }
+
+    .row {
+      margin: 40px 0 20px 30px;
+    }
+
+    .row h2 {
+      margin-left: 2px;
+    }
+
+    .row-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .row-posters {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      width: 95vw;
+    }
+
+    .row-posters img {
+      margin-right: 10px;
+      width: 160px;
+      height: 100px;
+      border-radius: 2px;
+      transition: transform 0.2s;
+    }
+
+    .row-posters img:hover {
+      transform: scale(1.08);
+      cursor: pointer;
+    }
+
+    .scroll-btn {
+      background: rgba(20,20,20,0.8);
+      color: #fff;
+      border: none;
+      font-size: 2rem;
+      width: 40px;
+      height: 100px;
+      cursor: pointer;
+      position: absolute;
+      z-index: 2;
+      transition: background 0.2s;
+    }
+
+    .scroll-btn.left {
+      left: 0;
+    }
+
+    .scroll-btn.right {
+      right: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">NETFLIX</div>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">TV Shows</a>
+      <a href="#">Movies</a>
+      <a href="#">My List</a>
+    </nav>
+    <div class="profile">
+      <img src="https://i.imgur.com/Oj1bJvA.png" alt="Profile" />
+    </div>
+  </header>
+
+  <section class="banner">
+    <img src="https://assets.nflxext.com/ffe/siteui/vlv3/960f7a51-0df7-483d-ace1-ddbacef02b32/0a0f5338-0dba-40df-908f-f1dc8a3f6b04/IN-en-20230731-popsignuptwoweeks-perspective_alpha_website_large.jpg" alt="Banner"/>
+    <div class="banner-content">
+      <h1>Featured Movie</h1>
+      <p>A thrilling adventure awaits you...</p>
+      <button>Play</button>
+      <button class="more-info">More Info</button>
+    </div>
+  </section>
+
+  <section class="row">
+    <h2>Trending Now</h2>
+    <div class="row-container">
+      <button class="scroll-btn left" onclick="scrollRow('trending', -1)">&#8249;</button>
+      <div class="row-posters trending">
+        <img src="https://image.tmdb.org/t/p/w200/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg" alt="Joker"/>
+        <img src="https://image.tmdb.org/t/p/w200/mtwVnYB0r3FbNoYNiF3xai6JTm.jpg" alt="Extraction"/>
+        <img src="https://image.tmdb.org/t/p/w200/6agKYU5IQFpuDyUYPu39w7UCRrJ.jpg" alt="6 Underground"/>
+        <img src="https://image.tmdb.org/t/p/w200/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg" alt=""/>
+        <img src="https://image.tmdb.org/t/p/w200/2CAL2433ZeIihfX1Hb2139CX0pW.jpg" alt=""/>
+        <img src="https://image.tmdb.org/t/p/w200/y95lQT1Jq7j2lsoxo0R3jhxKq59.jpg" alt=""/>
+      </div>
+      <button class="scroll-btn right" onclick="scrollRow('trending', 1)">&#8250;</button>
+    </div>
+  </section>
+
+  <script>
+    function scrollRow(rowClass, direction) {
+      const row = document.querySelector(`.row-posters.${rowClass}`);
+      const scrollAmount = 320; // Adjust as needed
+      row.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  </script>
+</body>
+</html>
