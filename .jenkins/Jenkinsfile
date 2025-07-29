@@ -16,11 +16,10 @@ pipeline {
 
     stages {
         stage('Checkout') {
-    steps {
-        git branch: "${params.BRANCH_NAME}", url: 'https://github.com/Rohankashid/DevOpsAssignment3.git'
-    }
-}
-
+            steps {
+                git branch: "${params.BRANCH_NAME}", url: 'https://github.com/Rohankashid/DevOpsAssignment3.git'
+            }
+        }
 
         stage('Backup Existing HTML') {
             steps {
@@ -37,22 +36,9 @@ pipeline {
             steps {
                 sshagent (credentials: ['ec2-ssh-key']) {
                     sh """
+                    set -e
                     scp index.html ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/index.html
                     ssh ${REMOTE_USER}@${REMOTE_HOST} "echo 'Deployed to ${params.ENV}'"
-                    """
-                }
-            }
-        }
-
-        stage('Rollback') {
-            when {
-                expression { currentBuild.result == 'FAILURE' }
-            }
-            steps {
-                sshagent (credentials: ['ec2-ssh-key']) {
-                    sh """
-                    ssh ${REMOTE_USER}@${REMOTE_HOST} "cp ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html ${REMOTE_DIR}/index.html || true"
-                    ssh ${REMOTE_USER}@${REMOTE_HOST} "echo 'Rollback executed'"
                     """
                 }
             }
@@ -64,7 +50,13 @@ pipeline {
             echo '✅ Deployment successful!'
         }
         failure {
-            echo '❌ Deployment failed. Rollback completed.'
+            echo '❌ Deployment failed. Rolling back...'
+            sshagent (credentials: ['ec2-ssh-key']) {
+                sh """
+                ssh ${REMOTE_USER}@${REMOTE_HOST} "cp ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html ${REMOTE_DIR}/index.html || true"
+                ssh ${REMOTE_USER}@${REMOTE_HOST} "echo 'Rollback executed'"
+                """
+            }
         }
     }
 }
