@@ -9,7 +9,7 @@ pipeline {
 
     environment {
         REMOTE_USER = "ubuntu"
-        REMOTE_HOST = "172-31-46-144"
+        REMOTE_HOST = "172.31.46.144"        
         REMOTE_DIR = "/var/www/html"
         BACKUP_DIR = "/home/ubuntu/backups"
     }
