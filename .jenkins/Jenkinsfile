@@ -9,7 +9,7 @@ pipeline {
 
     environment {
         REMOTE_USER = "ubuntu"
-        REMOTE_HOST = "56.228.23.177"
+        REMOTE_HOST = "172-31-46-144"
         REMOTE_DIR = "/var/www/html"
         BACKUP_DIR = "/home/ubuntu/backups"
     }
@@ -17,7 +17,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: "${params.BRANCH_NAME}", url: 'https://github.com/Rohankashid/DevOpsAssignment3.git'
+                git branch: "${params.BRANCH_NAME}", url: 'https://github.com/Rohankashid/DevOpsAssignment3/'
             }
         }
 
@@ -25,8 +25,8 @@ pipeline {
             steps {
                 sshagent (credentials: ['ec2-ssh-key']) {
                     sh """
-                    ssh ${REMOTE_USER}@${REMOTE_HOST} "mkdir -p ${BACKUP_DIR}/${params.DEPLOY_VERSION}"
-                    ssh ${REMOTE_USER}@${REMOTE_HOST} "cp ${REMOTE_DIR}/index.html ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html || true"
+                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "mkdir -p ${BACKUP_DIR}/${params.DEPLOY_VERSION}"
+                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "cp ${REMOTE_DIR}/index.html ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html || true"
                     """
                 }
             }
@@ -37,8 +37,8 @@ pipeline {
                 sshagent (credentials: ['ec2-ssh-key']) {
                     sh """
                     set -e
-                    scp index.html ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/index.html
-                    ssh ${REMOTE_USER}@${REMOTE_HOST} "echo 'Deployed to ${params.ENV}'"
+                    scp -o StrictHostKeyChecking=no index.html ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/index.html
+                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "echo '✅ Deployed to ${params.ENV}'"
                     """
                 }
             }
@@ -53,8 +53,8 @@ pipeline {
             echo '❌ Deployment failed. Rolling back...'
             sshagent (credentials: ['ec2-ssh-key']) {
                 sh """
-                ssh ${REMOTE_USER}@${REMOTE_HOST} "cp ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html ${REMOTE_DIR}/index.html || true"
-                ssh ${REMOTE_USER}@${REMOTE_HOST} "echo 'Rollback executed'"
+                ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "cp ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html ${REMOTE_DIR}/index.html || true"
+                ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "echo '🔁 Rollback executed'"
                 """
             }
         }
