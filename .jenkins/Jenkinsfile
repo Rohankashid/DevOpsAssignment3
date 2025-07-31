@@ -38,7 +38,7 @@ pipeline {
                     sh """
                     set -e
                     scp -o StrictHostKeyChecking=no index.html ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/index.html
-                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "echo '✅ Deployed to ${params.ENV}'"
+                    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "echo 'Deployed to ${params.ENV}'"
                     """
                 }
             }
@@ -47,14 +47,14 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo ' Deployment successful!'
         }
         failure {
-            echo '❌ Deployment failed. Rolling back...'
+            echo ' Deployment failed. Rolling back...'
             sshagent (credentials: ['ec2-ssh-key']) {
                 sh """
                 ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "cp ${BACKUP_DIR}/${params.DEPLOY_VERSION}/index.html ${REMOTE_DIR}/index.html || true"
-                ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "echo '🔁 Rollback executed'"
+                ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} "echo 'Rollback executed'"
                 """
             }
         }
